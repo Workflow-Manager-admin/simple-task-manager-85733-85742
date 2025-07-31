@@ -8,13 +8,34 @@ export default function AddTodo({ onAdded, onBack }) {
   const [detail, setDetail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // PUBLIC_INTERFACE
+  /**
+   * Handles todo creation form submission.
+   * On success, resets form and notifies parent.
+   * Handles and displays errors.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !detail.trim()) return;
+
     setLoading(true);
-    await supabase.from("todos").insert({ title, detail, completed: false });
+    try {
+      // Insert the todo; Supabase wants array of objects for .insert
+      const { error } = await supabase
+        .from("todos")
+        .insert([{ title, detail, completed: false }]);
+      if (error) {
+        // Show error to user (alert for simplicity; could use in-UI notice)
+        alert("Failed to add todo: " + error.message);
+      } else {
+        setTitle("");
+        setDetail("");
+        onAdded && onAdded();
+      }
+    } catch (err) {
+      alert("Unexpected error: " + (err.message || err));
+    }
     setLoading(false);
-    onAdded && onAdded();
   };
 
   return (
