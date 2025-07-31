@@ -1,47 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./design-system.css";
+import TodoList from "./TodoList";
+import AddTodo from "./AddTodo";
+import EditTodo from "./EditTodo";
 
 // PUBLIC_INTERFACE
+/**
+ * Main App routing logic for a simple todo app.
+ * Provides 3 states:
+ *   - "list": main todo list with add, edit, toggle, delete
+ *   - "add": add new todo form
+ *   - "edit": edit an existing todo
+ */
 function App() {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState("light");
+  // State: screen can be "list"|"add"|"edit"
+  const [screen, setScreen] = useState("list");
+  const [editingTodo, setEditingTodo] = useState(null);
 
-  // Effect to apply theme to document element
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // PUBLIC_INTERFACE
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Current theme: <strong>{theme}</strong>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App" style={{ minHeight: "100vh", background: "var(--color-ebebf5,#f8f9fa)" }}>
+      <button
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      >
+        {theme === "light" ? "🌙 Dark" : "☀️ Light"}
+      </button>
+      {screen === "list" && (
+        <TodoList
+          onAdd={() => setScreen("add")}
+          onEdit={(todo) => {
+            setEditingTodo(todo);
+            setScreen("edit");
+          }}
+        />
+      )}
+      {screen === "add" && (
+        <AddTodo
+          onAdded={() => setScreen("list")}
+          onBack={() => setScreen("list")}
+        />
+      )}
+      {screen === "edit" && (
+        <EditTodo
+          todo={editingTodo}
+          onUpdated={() => setScreen("list")}
+          onBack={() => setScreen("list")}
+        />
+      )}
     </div>
   );
 }
