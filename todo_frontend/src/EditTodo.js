@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "./supabaseClient";
-import "./../assets/design-system.css";
+import "./design-system.css";
 
 // PUBLIC_INTERFACE
 export default function EditTodo({ todo, onUpdated, onBack }) {
